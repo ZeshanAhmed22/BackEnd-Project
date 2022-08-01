@@ -18,7 +18,6 @@ describe("GET /api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then((response) => {
-        console.log(response.body);
         expect(response.body.topics.length).toBeGreaterThanOrEqual(1);
         response.body.topics.forEach((topics) => {
           expect.objectContaining({
