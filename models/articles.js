@@ -12,3 +12,16 @@ exports.fetchArticles = async (id) => {
 
   return articles;
 };
+
+exports.fetchPatchedArticle = async (id, inc_votes) => {
+  const { rows: articles } = await db.query(
+    "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;",
+    [inc_votes, id]
+  );
+
+  if (articles.length === 0) {
+    return Promise.reject({ status: 404, msg: "id not found" });
+  }
+
+  return articles;
+};
