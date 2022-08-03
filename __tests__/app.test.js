@@ -93,3 +93,20 @@ describe("/api/articles/id", () => {
     });
   });
 });
+describe("GET /api/users", () => {
+  test("returns an array of users with  and description", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.users.length).toBeGreaterThanOrEqual(1);
+        response.body.users.forEach((users) => {
+          expect.objectContaining({
+            users_username: expect.any(String),
+            users_name: expect.any(String),
+            users_avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+});
