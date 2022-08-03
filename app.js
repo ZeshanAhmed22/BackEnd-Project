@@ -1,10 +1,14 @@
 const express = require("express");
 const app = express();
-const { getTopics } = require("../be-nc-news/controllers/topics");
-app.get("/api/topics", getTopics);
+const { getTopics } = require("./controllers/topics");
+const { getArticles } = require("./controllers/articles");
+const { handleServerError } = require("./errors/errors");
+const { handleCustomErrors } = require("./errors/errors");
 
-app.use((err, request, response, next) => {
-  response.status(500).send("Server Error");
-});
+app.get("/api/topics", getTopics);
+app.get("/api/articles/:id", getArticles);
+
+app.use(handleCustomErrors);
+app.use(handleServerError);
 
 module.exports = app;

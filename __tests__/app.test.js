@@ -28,3 +28,26 @@ describe("GET /api/topics", () => {
       });
   });
 });
+
+describe("GET /api/articles/id", () => {
+  test("returns an array of articles with matching id", async () => {
+    const { body } = await request(app).get("/api/articles/1").expect(200);
+
+    body.article.forEach((article) => {
+      expect(article).toMatchObject({
+        article_id: 1,
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: expect.any(String),
+        votes: 100,
+      });
+    });
+  });
+  test("when passed an invalid id responds with a 404 message.", async () => {
+    const { body } = await request(app).get("/api/articles/9000").expect(404);
+
+    expect(body.msg).toBe("id not found");
+  });
+});
