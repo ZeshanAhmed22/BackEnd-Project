@@ -1,8 +1,10 @@
 const db = require("../db/connection");
 
-exports.fetchArticles = async (id) => {
+exports.fetchArticlesById = async (id) => {
   const { rows: articles } = await db.query(
-    "SELECT * FROM comments INNER JOIN articles ON articles.article_id = comments.article_id WHERE comments.article_id = $1;",
+    `SELECT articles.*, COUNT(comments.     comment_id) AS comment_count
+     FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 
+     GROUP BY articles.article_id`,
     [id]
   );
 
