@@ -142,4 +142,40 @@ describe("/api/articles/id", () => {
         });
     });
   });
+  ////////////////////////////////////// Articles/article_id_comments
+  describe("GET /api/article/article_id/comments", () => {
+    test("returns an array of comments by article id", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((response) => {
+          console.log(response.body);
+          expect(response.body.comments.length).toBeGreaterThanOrEqual(1);
+          response.body.comments.forEach((comment) => {
+            expect(comment).toEqual(
+              expect.objectContaining({
+                article_id: 1,
+                comment_id: expect.any(Number),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+    test("when passed a valid query but no article responds with a 404 message.", async () => {
+      const { body } = await request(app).get("/api/articles/9000").expect(404);
+
+      expect(body.msg).toBe("id not found");
+    });
+    test("when passed an id which is not a number responds with a 400 error message.", async () => {
+      const { body } = await request(app)
+        .get("/api/articles/not-a-number")
+        .expect(400);
+
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
 });
