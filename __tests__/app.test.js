@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
+const { response } = require("../app");
 
 beforeEach(() => {
   return seed(data);
@@ -149,7 +150,6 @@ describe("/api/articles/id", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then((response) => {
-          console.log(response.body);
           expect(response.body.comments.length).toBeGreaterThanOrEqual(1);
           response.body.comments.forEach((comment) => {
             expect(comment).toEqual(
@@ -173,6 +173,42 @@ describe("/api/articles/id", () => {
     test("when passed an id which is not a number responds with a 400 error message.", async () => {
       const { body } = await request(app)
         .get("/api/articles/not-a-number")
+        .expect(400);
+
+      expect(body.msg).toBe("Invalid input");
+    });
+  });
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("post request should return a username and body object", () => {
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a comment",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(201)
+        .then(() => {
+          expect.objectContaining({
+            article_id: 1,
+            comment_id: expect.any(Number),
+            author: "butter_bridge",
+            body: "This is a comment",
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          });
+        });
+    });
+    test("when passed a valid query but no article responds with a 404 message.", async () => {
+      const { body } = await request(app)
+        .post("/api/articles/9000/comments")
+        .expect(404);
+
+      expect(body.msg).toBe("id not found");
+    });
+    test("when passed an id which is not a number responds with a 400 error message.", async () => {
+      const { body } = await request(app)
+        .post("/api/articles/not-a-number/comments")
         .expect(400);
 
       expect(body.msg).toBe("Invalid input");

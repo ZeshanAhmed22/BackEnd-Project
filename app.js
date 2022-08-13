@@ -7,7 +7,10 @@ const {
 } = require("./controllers/articlesById");
 const { getUsers } = require("./controllers/users");
 const { getArticle } = require("./controllers/article");
-const { getCommentsByArticleId } = require("./controllers/commentsById");
+const {
+  getCommentsByArticleId,
+  postComments,
+} = require("./controllers/commentsById");
 const {
   handleServerError,
   handlePsqlError,
@@ -22,6 +25,7 @@ app.patch("/api/articles/:id", patchArticles);
 app.get("/api/users", getUsers);
 app.get("/api/article", getArticle);
 app.get("/api/articles/:id/comments", getCommentsByArticleId);
+app.post("/api/articles/:id/comments", postComments);
 
 app.use(handleCustomErrors);
 app.use(handlePsqlError);
