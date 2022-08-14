@@ -1,7 +1,13 @@
 const { fetchArticles } = require("../models/article");
 
 exports.getArticle = (request, response, next) => {
-  fetchArticles().then((article) => {
-    response.status(200).send({ article });
-  });
+  const { sortby, orderby } = request.query;
+
+  fetchArticles(sortby, orderby)
+    .then((article) => {
+      response.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
