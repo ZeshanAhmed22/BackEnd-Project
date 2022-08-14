@@ -3,7 +3,6 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
-const { response } = require("../app");
 
 beforeEach(() => {
   return seed(data);
@@ -140,6 +139,42 @@ describe("/api/articles/id", () => {
               article_comment_count: expect.any(String),
             });
           });
+        });
+    });
+    test("sort_by, returns the articles by any valid column sorted defaulting to date descending ", () => {
+      return request(app)
+        .get("/api/article")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.article).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("sort_by returns the articles by author ascending", () => {
+      return request(app)
+        .get("/api/article?sortby=author&orderby=ASC")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.article).toBeSortedBy("author", {
+            ascending: true,
+          });
+        });
+    });
+    test("sort_by returns an error message with status 400 when not passed a vaild sortby query", () => {
+      return request(app)
+        .get("/api/article?sortby=banana")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("order_by returns an error message with status 400 when not passed a vaild orderby query", () => {
+      return request(app)
+        .get("/api/article?orderby=banana")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
         });
     });
   });

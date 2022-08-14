@@ -13,14 +13,10 @@ exports.getCommentsByArticleId = (request, response, next) => {
 };
 
 exports.postComments = (request, response, next) => {
-  console.log("in the controller");
   const { id } = request.params;
-  console.log(request.body);
 
   fetchArticlesById(id)
     .then((article) => {
-      console.log(article);
-
       insertComments(request.body, id).then((comments) => {
         response.status(201).send(comments);
       });
