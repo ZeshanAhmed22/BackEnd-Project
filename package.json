@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "bc-nc-news",
   "main": "index.js",
+  "engines": {
+    "node": "18.6.0"
+  },
   "scripts": {
     "start": "node listen.js",
     "setup-dbs": "psql -f ./db/setup.sql",
