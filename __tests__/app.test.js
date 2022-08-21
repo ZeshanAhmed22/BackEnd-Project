@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
+const { response } = require("../app");
 
 beforeEach(() => {
   return seed(data);
@@ -161,6 +162,16 @@ describe("/api/articles/id", () => {
           });
         });
     });
+    test("topic returns a 200 message when passed a valid topic. ", () => {
+      return request(app)
+        .get("/api/article?topic=mitch")
+        .expect(200)
+        .then((response) => {
+          response.body.article.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
     test("sort_by returns an error message with status 400 when not passed a vaild sortby query", () => {
       return request(app)
         .get("/api/article?sortby=banana")
@@ -177,76 +188,122 @@ describe("/api/articles/id", () => {
           expect(response.body.msg).toBe("Bad request");
         });
     });
-  });
-  ////////////////////////////////////// Articles/article_id_comments
-  describe("GET /api/article/article_id/comments", () => {
-    test("returns an array of comments by article id", () => {
+
+    test("topic returns a 400 message when passed a invalid topic. ", () => {
       return request(app)
-        .get("/api/articles/1/comments")
-        .expect(200)
+        .get("/api/article?topic=22")
+        .expect(400)
         .then((response) => {
-          expect(response.body.comments.length).toBeGreaterThanOrEqual(1);
-          response.body.comments.forEach((comment) => {
-            expect(comment).toEqual(
-              expect.objectContaining({
-                article_id: 1,
-                comment_id: expect.any(Number),
-                author: expect.any(String),
-                body: expect.any(String),
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-              })
-            );
-          });
+          expect(response.body.msg).toBe("Bad request");
         });
     });
-    test("when passed a valid query but no article responds with a 404 message.", async () => {
-      const { body } = await request(app).get("/api/articles/9000").expect(404);
-
-      expect(body.msg).toBe("id not found");
-    });
-    test("when passed an id which is not a number responds with a 400 error message.", async () => {
-      const { body } = await request(app)
-        .get("/api/articles/not-a-number")
-        .expect(400);
-
-      expect(body.msg).toBe("Invalid input");
+    test("topic returns a 404 message when passed a valid topic that doesnt exist. ", () => {
+      return request(app)
+        .get("/api/article?topic=banana")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("Topic Not Found");
+        });
     });
   });
-  describe("POST /api/articles/:article_id/comments", () => {
-    test("post request should return a username and body object", () => {
-      const newComment = {
-        username: "butter_bridge",
-        body: "This is a comment",
-      };
-      return request(app)
-        .post("/api/articles/1/comments")
-        .send(newComment)
-        .expect(201)
-        .then(() => {
-          expect.objectContaining({
-            article_id: 1,
-            comment_id: expect.any(Number),
-            author: "butter_bridge",
-            body: "This is a comment",
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-          });
+});
+////////////////////////////////////// Articles/article_id_comments
+describe("GET /api/article/article_id/comments", () => {
+  test("returns an array of comments by article id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments.length).toBeGreaterThanOrEqual(1);
+        response.body.comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              article_id: 1,
+              comment_id: expect.any(Number),
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+            })
+          );
         });
-    });
-    test("when passed a valid query but no article responds with a 404 message.", async () => {
-      const { body } = await request(app)
-        .post("/api/articles/9000/comments")
-        .expect(404);
+      });
+  });
 
-      expect(body.msg).toBe("id not found");
-    });
-    test("when passed an id which is not a number responds with a 400 error message.", async () => {
-      const { body } = await request(app)
-        .post("/api/articles/not-a-number/comments")
-        .expect(400);
+  test("when passed a valid query but no article responds with a 404 message.", async () => {
+    const { body } = await request(app).get("/api/articles/9000").expect(404);
 
-      expect(body.msg).toBe("Invalid input");
-    });
+    expect(body.msg).toBe("id not found");
+  });
+  test("when passed an id which is not a number responds with a 400 error message.", async () => {
+    const { body } = await request(app)
+      .get("/api/articles/not-a-number")
+      .expect(400);
+
+    expect(body.msg).toBe("Invalid input");
+  });
+});
+describe("POST /api/articles/:article_id/comments", () => {
+  test("post request should return a username and body object", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(() => {
+        expect.objectContaining({
+          article_id: 1,
+          comment_id: expect.any(Number),
+          author: "butter_bridge",
+          body: "This is a comment",
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+        });
+      });
+  });
+  test("when passed a valid query but no article responds with a 404 message.", async () => {
+    const { body } = await request(app)
+      .post("/api/articles/9000/comments")
+      .expect(404);
+
+    expect(body.msg).toBe("id not found");
+  });
+  test("when passed an id which is not a number responds with a 400 error message.", async () => {
+    const { body } = await request(app)
+      .post("/api/articles/not-a-number/comments")
+      .expect(400);
+
+    expect(body.msg).toBe("Invalid input");
+  });
+});
+////////////////////////////// DELETE /api/comments/:comment_id
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("- delete the given comment by `comment_id`", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then((response) => {
+        expect(response.body).toEqual({});
+      });
+  });
+  test("when passed a valid query but no id exists responds with a 404 message.", () => {
+    return request(app)
+      .delete("/api/comments/9000")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("id not found");
+      });
+  });
+  test("when passed a invalid id responds with a 400 message.", () => {
+    return request(app)
+      .delete("/api/comments/not-a-number")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid input");
+      });
   });
 });
