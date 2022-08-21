@@ -16,9 +16,12 @@ const {
   handlePsqlError,
   handleCustomErrors,
 } = require("./errors/errors");
+const { deleteComment } = require("./controllers/comments");
+const { getApi } = require("./controllers/api");
 
 app.use(express.json());
 
+app.get("/api", getApi);
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:id", getArticlesById);
 app.patch("/api/articles/:id", patchArticles);
@@ -26,6 +29,7 @@ app.get("/api/users", getUsers);
 app.get("/api/article", getArticle);
 app.get("/api/articles/:id/comments", getCommentsByArticleId);
 app.post("/api/articles/:id/comments", postComments);
+app.delete("/api/comments/:id", deleteComment);
 
 app.use(handleCustomErrors);
 app.use(handlePsqlError);
