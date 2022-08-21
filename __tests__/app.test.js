@@ -13,6 +13,20 @@ afterAll(() => {
   if (db.end) db.end();
 });
 
+////////////////// api
+describe("GET /api", () => {
+  test("returns an object with all endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        Object.keys(response.body).forEach((api) => {
+          expect(typeof api).toBe("string");
+        });
+      });
+  });
+});
+
 /////////////////////////////////// TOPICS
 describe("GET /api/topics", () => {
   test("returns an array of topics with slug and description", () => {
@@ -33,7 +47,7 @@ describe("GET /api/topics", () => {
 //////////////////////////////// ARTICLESBYID
 describe("/api/articles/id", () => {
   describe("GET", () => {
-    test("returns an array of articles with matching id", async () => {
+    test("returns an array of articles with the matching id", async () => {
       const { body } = await request(app).get("/api/articles/1").expect(200);
 
       body.article.forEach((article) => {
@@ -129,16 +143,18 @@ describe("/api/articles/id", () => {
         .then((response) => {
           expect(response.body.article.length).toBeGreaterThanOrEqual(1);
           response.body.article.forEach((article) => {
-            expect.objectContaining({
-              article_article_id: expect.any(Number),
-              article_title: expect.any(String),
-              article_topic: expect.any(String),
-              article_author: expect.any(String),
-              article_body: expect.any(String),
-              article_created_at: expect.any(String),
-              article_votes: expect.any(Number),
-              article_comment_count: expect.any(String),
-            });
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(String),
+              })
+            );
           });
         });
     });

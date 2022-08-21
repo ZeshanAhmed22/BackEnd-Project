@@ -11,17 +11,95 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": ["topic", "sortby", "orderby"],
     "exampleResponse": {
       "articles": [
         {
+          "article_id": 1,
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": "1527695953341",
+          "votes": 100,
+          "comment_count": 21
         }
       ]
     }
+  },
+  "GET /api/articles/:id": {
+    "description": "returns an array of articles with the matching id",
+    "queries": [],
+    "params": { "id": 1 },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "152769342353341",
+        "votes": 100
+      }
+    }
+  },
+  "PATCH /api/articles/:id": {
+    "description": "Updates the votes property of the article object using article_id",
+    "queries": [],
+    "params": { "id": 1 },
+    "body": { "inc_votes": 50 },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "152769342353341",
+        "votes": 150
+      }
+    }
+  },
+  "GET /api/articles/:id/comments": {
+    "description": "Returns an array of all the comments using article_id",
+    "queries": [],
+    "params": { "id": 1 },
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          "votes": 16,
+          "author": "butter_bridge",
+          "article_id": 9,
+          "created_at": "1586179020000"
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:id/comments": {
+    "description": "Creates a new comment using username, body and article_id",
+    "queries": [],
+    "params": { "id": 1 },
+    "body": {
+      "username": "butter_bridge",
+      "body": "This is a comment"
+    },
+    "exampleResponse": {
+      "comment": {
+        "article_id": 1,
+        "comment_id": 5,
+        "votes": 0,
+        "author": "butter_bridge",
+        "body": "This is a comment",
+        "created_at": "1586179020032"
+      }
+    }
+  },
+  "DELETE /api/comments/:id": {
+    "description": "Deletes a comment using comment_id",
+    "queries": [],
+    "params": { "id": 50 },
+    "exampleResponse": {}
   }
 }
