@@ -7,9 +7,13 @@ const {
 exports.getCommentsByArticleId = (request, response, next) => {
   const { id } = request.params;
 
-  fetchCommentsByArticleId(id).then((comments) => {
-    response.status(200).send({ comments });
-  });
+  fetchCommentsByArticleId(id)
+    .then((comments) => {
+      response.status(200).send({ comments });
+    })
+    .catch((err) => {
+      response.status(400).send("Bad Request");
+    });
 };
 
 exports.postComments = (request, response, next) => {
