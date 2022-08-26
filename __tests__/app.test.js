@@ -260,7 +260,7 @@ describe("GET /api/article/article_id/comments", () => {
   });
 });
 describe("POST /api/articles/:article_id/comments", () => {
-  test("post request should return a username and body object", () => {
+  test.only("post request should return a username and body object", () => {
     const newComment = {
       username: "butter_bridge",
       body: "This is a comment",
@@ -269,15 +269,17 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/1/comments")
       .send(newComment)
       .expect(201)
-      .then(() => {
-        expect.objectContaining({
-          article_id: 1,
-          comment_id: expect.any(Number),
-          author: "butter_bridge",
-          body: "This is a comment",
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-        });
+      .then((response) => {
+        expect(response.body.comments).toEqual(
+          expect.objectContaining({
+            article_id: 1,
+            comment_id: expect.any(Number),
+            author: "butter_bridge",
+            body: "This is a comment",
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
       });
   });
   test("when passed a valid query but no article responds with a 404 message.", async () => {

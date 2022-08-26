@@ -22,7 +22,7 @@ exports.postComments = (request, response, next) => {
   fetchArticlesById(id)
     .then((article) => {
       insertComments(request.body, id).then((comments) => {
-        response.status(201).send(comments);
+        response.status(201).send({ comments: comments[0] });
       });
     })
     .catch((err) => {
