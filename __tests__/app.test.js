@@ -260,7 +260,7 @@ describe("GET /api/article/article_id/comments", () => {
   });
 });
 describe("POST /api/articles/:article_id/comments", () => {
-  test.only("post request should return a username and body object", () => {
+  test("post request should return a username and body object", () => {
     const newComment = {
       username: "butter_bridge",
       body: "This is a comment",
@@ -283,18 +283,36 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
   test("when passed a valid query but no article responds with a 404 message.", async () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a comment",
+    };
     const { body } = await request(app)
       .post("/api/articles/9000/comments")
+      .send(newComment)
       .expect(404);
 
     expect(body.msg).toBe("id not found");
   });
   test("when passed an id which is not a number responds with a 400 error message.", async () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a comment",
+    };
     const { body } = await request(app)
       .post("/api/articles/not-a-number/comments")
+      .send(newComment)
       .expect(400);
 
     expect(body.msg).toBe("Invalid input");
+  });
+  test("when not passed a username or body returns a 400 error message.", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid Input");
+      });
   });
 });
 ////////////////////////////// DELETE /api/comments/:comment_id

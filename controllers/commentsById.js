@@ -1,3 +1,4 @@
+const { log } = require("../db/connection");
 const { fetchArticlesById } = require("../models/articlesById");
 const {
   fetchCommentsByArticleId,
@@ -18,10 +19,15 @@ exports.getCommentsByArticleId = (request, response, next) => {
 
 exports.postComments = (request, response, next) => {
   const { id } = request.params;
+  const newComment = request.body;
+
+  if (!newComment.username || !newComment.body) {
+    return response.status(400).send({ msg: "Invalid Input" });
+  }
 
   fetchArticlesById(id)
     .then((article) => {
-      insertComments(request.body, id).then((comments) => {
+      insertComments(newComment, id).then((comments) => {
         response.status(201).send({ comments: comments[0] });
       });
     })

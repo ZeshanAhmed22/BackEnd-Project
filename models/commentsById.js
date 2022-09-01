@@ -14,3 +14,12 @@ exports.insertComments = (newComment, id) => {
     )
     .then((result) => result.rows);
 };
+exports.fetchCommentsByCommentsId = (id) => {
+  console.log(id);
+  return db
+    .query("SELECT * FROM comments WHERE comments.comment_id = $1;", [id])
+    .then((result) => {
+      console.log(result.rows);
+      return result.rows;
+    });
+};
